@@ -1,42 +1,32 @@
 package org.example;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
 
-        List<Integer> numbers = List.of(10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
-
-        // Filter a list of numbers and only output the even numbers.
-
-        List<Integer> filteredList = numbers.stream()
-                .filter(number -> number % 2 == 0)
-                .toList();
-
-        System.out.println(filteredList);
-
-        // Map a list of numbers and multiply each number by 2.
-
-        List<Integer> mappedList = numbers.stream()
-                .map(number -> number * 2)
-                .toList();
-
-        System.out.println(mappedList);
-
-        // Sort the list in ascending order.
-        List<Integer> ascendingList = numbers.stream()
-                .sorted()
-                .toList();
+        // StreamsExercise.main(args);
 
 
-        System.out.println(ascendingList);
+        Set<Student> students = new HashSet<>(); // Using a Set to remove duplicates
 
-        List<Integer> newList = numbers.stream()
-                .filter(number -> number % 2 == 0).map(number -> number * 2).sorted().collect(Collectors.toList());
+        try (Stream<String> stream = Files.lines(Paths.get(ClassLoader.getSystemResource("students.csv").toURI()))) {
+            stream
+                    .skip(1) // Skipping the header
+                    .filter(line -> !line.trim().isEmpty()) // Skipping empty lines
+                    .map(Student::new) // Converting each line to a Student object
+                    .filter(Student::isValid) // Filtering out invalid lines
+                    .forEach(students::add); // Adding to the set to remove duplicates
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        System.out.println(newList);
-
-        System.out.println(newList.stream().reduce(0, Integer::sum));
+        // Printing the students
+        System.out.println("Students:");
+        students.forEach(System.out::println);
     }
 }
